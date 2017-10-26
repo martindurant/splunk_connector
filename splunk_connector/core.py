@@ -4,7 +4,10 @@ import io
 import requests
 import pandas as pd
 import time
-
+import warnings
+# because Splunk connections are against a self-signed cert, all connections
+# would raise a warning
+warnings.filterwarnings('ignore', module='urllib3.connectionpool')
 
 class SplunkConnect:
 
@@ -93,7 +96,7 @@ class SplunkConnect:
         path =  '/services/search/jobs/{}?output_mode=json'.format(sid)
         r = requests.get(self.url +path,  verify=False, headers=self.head)
         out = r.json()['entry'][0]['content']
-        return out['isDone'], out.get('eventCount', 0)
+        return out['isDone'], out.get('resultCount', 0)
 
     def wait_poll(self, sid):
         time0 = time.time()
